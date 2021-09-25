@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SR3.Data;
 using SR3.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SR3.Controllers
 {
@@ -58,6 +56,7 @@ namespace SR3.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (await IsBrandExist(brand.BrandName)) return View(brand);
                 brand.BrandId = Guid.NewGuid();
                 _context.Add(brand);
                 await _context.SaveChangesAsync();
@@ -65,7 +64,8 @@ namespace SR3.Controllers
             }
             return View(brand);
         }
-
+        private async Task<bool> IsBrandExist(string name) 
+            => await _context.Brand.AnyAsync(x => x.BrandName.Equals(name));
         // GET: Brands/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
